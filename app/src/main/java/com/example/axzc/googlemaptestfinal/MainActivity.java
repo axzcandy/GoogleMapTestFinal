@@ -1,5 +1,7 @@
 package com.example.axzc.googlemaptestfinal;
 
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Debug;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +18,10 @@ import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.SupportMapFragment;
+
+import java.util.List;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity implements  OnMapReadyCallback, GoogleMap.OnCameraIdleListener, GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnCameraMoveListener, GoogleMap.OnCameraMoveCanceledListener, GoogleMap.OnMapClickListener {
     private GoogleMap gmap;
@@ -23,7 +29,7 @@ public class MainActivity extends AppCompatActivity implements  OnMapReadyCallba
     private static final String MAP_VIEW_BUNDLE_KEY = "AIzaSyA2gkFQJeRSU6AveQMtbYc6FbxAkUUz4lo";
 
     Button btn_search,btn_set;
-    EditText edtxt_x,edtxt_y;
+    EditText edtxt_x,edtxt_y,edtxt_search;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +38,32 @@ public class MainActivity extends AppCompatActivity implements  OnMapReadyCallba
 
         edtxt_x=(EditText)findViewById(R.id.editText_xInput);
         edtxt_y=(EditText)findViewById(R.id.editText_yInput);
+        edtxt_search=(EditText)findViewById(R.id.editText_searchInput);
+
+        btn_search=(Button)findViewById(R.id.button_search);
+        btn_search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String location="";
+                location=edtxt_search.getText().toString();
+
+                List<Address> addressList = null;
+
+                if (location != null || !location.equals("")) {
+                    Geocoder geocoder = new Geocoder(MainActivity.this);
+                    try {
+                        addressList = geocoder.getFromLocationName(location, 1);
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Address address = addressList.get(0);
+                    LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                    gmap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
+                    gmap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+                }
+            }
+        });
 
         btn_set=(Button)findViewById(R.id.button_xyInput);
         btn_set.setOnClickListener(new View.OnClickListener() {
